@@ -81,7 +81,37 @@ exports.childSignUp = async (req, res) => {
                 firstName,
                 lastName,
                 parentId
-            })}
+            })
+            await reference.child('parents').child(parentId).once('value', snapshot => {
+                let parentData = snapshot.val();
+                let childrenIds;
+                if (parentData) {
+                    console.log(parentData);
+                    childrenIds = parentData.childrenIds;
+                    if (childrenIds)
+                    {
+                        console.log("IN IF");
+                        const numberOfChildren = Object.keys(childrenIds).length;
+                        childrenIds[numberOfChildren] = uid
+                    }
+                    else
+                    {
+                        console.log(parentData.email);
+                        childrenIds = { 0: uid };
+                        console.log(parentData);
+                    }
+                    parentData.childrenIds = childrenIds;
+                    reference.child('parents').child(parentId).set(parentData);
+                    }
+                    else
+                    {
+                        return res.status(404).json({
+                            message: 'Could not bind child to parent !'
+                        })
+                    }
+            })
+            }
+
             catch (error){
                 return res.status(400).json({
                     message: error.message

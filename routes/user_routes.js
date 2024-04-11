@@ -6,6 +6,6 @@ module.exports = app => {
     router.post("/child/signup", userController.childSignUp);
 
     router.post("/parent/signup", userController.parentSignUp);
-
+    
     app.use("/api/users", router);
 }
